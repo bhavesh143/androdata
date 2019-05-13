@@ -1,0 +1,55 @@
+
+
+public static final String PREFS_GAME ="com.abhiandroid.abhiapp.GamePlay";
+public static final String GAME_SCORE= "GameScore";
+
+//======== Code to save data ===================
+
+SharedPreferences sp = getSharedPreferences(PREFS_GAME ,Context.MODE_PRIVATE);
+sp.edit().putInt(GAME_SCORE,100).commit();
+
+//========= Code to get saved/ retrieve data ==============
+
+SharedPreferences sp = getSharedPreferences(PREFS_GAME ,Context.MODE_PRIVATE);
+int sc  = sp.getInt(GAME_SCORE,0);
+Log.d("AbhiAndroid","achieved score  is "+ sc);
+
+
+------------------------
+
+package com.samplesharedpreferences;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+
+/**
+ * Class for Shared Preference
+ */
+public class PrefManager {
+
+    Context context;
+
+    PrefManager(Context context) {
+        this.context = context;
+    }
+
+    public void saveLoginDetails(String email, String password) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("LoginDetails", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("Email", email);
+        editor.putString("Password", password);
+        editor.commit();
+    }
+
+    public String getEmail() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("LoginDetails", Context.MODE_PRIVATE);
+        return sharedPreferences.getString("Email", "");
+    }
+
+    public boolean isUserLogedOut() {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("LoginDetails", Context.MODE_PRIVATE);
+        boolean isEmailEmpty = sharedPreferences.getString("Email", "").isEmpty();
+        boolean isPasswordEmpty = sharedPreferences.getString("Password", "").isEmpty();
+        return isEmailEmpty || isPasswordEmpty;
+    }
+}

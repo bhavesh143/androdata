@@ -1,0 +1,149 @@
+
+===========Images
+
+    public static ArrayList<Model_images> al_images = new ArrayList();
+    boolean boolean_folder = false;
+
+    @SuppressLint({"Recycle"})
+    public ArrayList<Model_images> fn_imagespath() {
+        int i;
+        al_images.clear();
+        al_images = new ArrayList();
+        int int_position = 0;
+        String orderBy = "datetaken";
+        Cursor cursor = getContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[]{"_data", "bucket_display_name"}, null, null, "datetaken DESC");
+        if (cursor != null) {
+            int column_index_data = cursor.getColumnIndexOrThrow("_data");
+            int column_index_folder_name = cursor.getColumnIndexOrThrow("bucket_display_name");
+            while (cursor.moveToNext()) {
+                String absolutePathOfImage = cursor.getString(column_index_data);
+                if (al_images.size() > 0) {
+                    for (i = 0; i < al_images.size(); i++) {
+                        if (((Model_images) al_images.get(i)).getStr_folder().equals(cursor.getString(column_index_folder_name))) {
+                            this.boolean_folder = true;
+                            int_position = i;
+                            break;
+                        }
+                        this.boolean_folder = false;
+                    }
+                } else {
+                    this.boolean_folder = false;
+                }
+                ArrayList<String> al_path;
+                ArrayList<Boolean> al_path_boolean;
+                ArrayList<Float> al_path_rotation;
+                if (this.boolean_folder) {
+                    al_path = new ArrayList();
+                    al_path.addAll(((Model_images) al_images.get(int_position)).getAl_imagepath());
+                    al_path.add(absolutePathOfImage);
+                    al_path_boolean = new ArrayList();
+                    for (i = 0; i < ((Model_images) al_images.get(int_position)).getAl_imagepath().size(); i++) {
+                        al_path_boolean.add(Boolean.valueOf(false));
+                    }
+                    al_path_boolean.add(Boolean.valueOf(false));
+                    ((Model_images) al_images.get(int_position)).setAl_image_checked(al_path_boolean);
+                    al_path_rotation = new ArrayList();
+                    for (i = 0; i < al_path.size(); i++) {
+                        al_path_rotation.add(Float.valueOf(0.0f));
+                    }
+                    ((Model_images) al_images.get(int_position)).setAl_imagepath_rotation(al_path_rotation);
+                    ((Model_images) al_images.get(int_position)).setAl_imagepath(al_path);
+                } else {
+                    al_path = new ArrayList();
+                    al_path.add(absolutePathOfImage);
+                    Model_images obj_model = new Model_images();
+                    obj_model.setStr_folder(cursor.getString(column_index_folder_name));
+                    obj_model.setAl_imagepath(al_path);
+                    al_path_boolean = new ArrayList();
+                    al_path_boolean.add(Boolean.valueOf(false));
+                    al_path_rotation = new ArrayList();
+                    for (i = 0; i < al_path.size(); i++) {
+                        al_path_rotation.add(Float.valueOf(0.0f));
+                    }
+                    obj_model.setAl_imagepath_rotation(al_path_rotation);
+                    obj_model.setAl_image_checked(al_path_boolean);
+                    al_images.add(obj_model);
+                }
+            }
+        }
+        for (i = 0; i < al_images.size(); i++) {
+            for (int j = 0; j < ((Model_images) al_images.get(i)).getAl_imagepath().size(); j++) {
+            }
+        }
+        return al_images;
+    }
+
+===========Videos
+
+    boolean boolean_folder = false;
+    public static ArrayList<Model_videos> al_videos = new ArrayList();
+
+    @SuppressLint({"Recycle"})
+    public ArrayList<Model_videos> fn_videospath() {
+        int i;
+        al_videos.clear();
+        al_videos = new ArrayList();
+        int int_position = 0;
+        String orderBy = "datetaken";
+        Cursor cursor = getContext().getContentResolver().query(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, new String[]{"_data", "bucket_display_name"}, null, null, "datetaken DESC");
+        if (cursor != null) {
+            int column_index_data = cursor.getColumnIndexOrThrow("_data");
+            int column_index_folder_name = cursor.getColumnIndexOrThrow("bucket_display_name");
+            while (cursor.moveToNext()) {
+                String absolutePathOfImage = cursor.getString(column_index_data);
+                if (al_videos.size() > 0) {
+                    for (i = 0; i < al_videos.size(); i++) {
+                        if (((Model_videos) al_videos.get(i)).getStr_folder().equals(cursor.getString(column_index_folder_name))) {
+                            this.boolean_folder = true;
+                            int_position = i;
+                            break;
+                        }
+                        this.boolean_folder = false;
+                    }
+                } else {
+                    this.boolean_folder = false;
+                }
+                ArrayList<String> al_path;
+                ArrayList<Boolean> al_path_boolean;
+                ArrayList<Float> al_path_rotation;
+                if (this.boolean_folder) {
+                    al_path = new ArrayList();
+                    al_path.addAll(((Model_videos) al_videos.get(int_position)).getAl_videopath());
+                    al_path.add(absolutePathOfImage);
+                    al_path_boolean = new ArrayList();
+                    for (i = 0; i < ((Model_videos) al_videos.get(int_position)).getAl_videopath().size(); i++) {
+                        al_path_boolean.add(Boolean.valueOf(false));
+                    }
+                    al_path_boolean.add(Boolean.valueOf(false));
+                    ((Model_videos) al_videos.get(int_position)).setAl_video_checked(al_path_boolean);
+                    al_path_rotation = new ArrayList();
+                    for (i = 0; i < al_path.size(); i++) {
+                        al_path_rotation.add(Float.valueOf(0.0f));
+                    }
+                    ((Model_videos) al_videos.get(int_position)).setAl_videopath_rotation(al_path_rotation);
+                    ((Model_videos) al_videos.get(int_position)).setAl_videopath(al_path);
+                } else {
+                    al_path = new ArrayList();
+                    al_path.add(absolutePathOfImage);
+                    Model_videos obj_model = new Model_videos();
+                    obj_model.setStr_folder(cursor.getString(column_index_folder_name));
+                    obj_model.setAl_videopath(al_path);
+                    al_path_boolean = new ArrayList();
+                    al_path_boolean.add(Boolean.valueOf(false));
+                    al_path_rotation = new ArrayList();
+                    for (i = 0; i < al_path.size(); i++) {
+                        al_path_rotation.add(Float.valueOf(0.0f));
+                    }
+                    obj_model.setAl_videopath_rotation(al_path_rotation);
+                    obj_model.setAl_video_checked(al_path_boolean);
+                    al_videos.add(obj_model);
+                }
+            }
+        }
+        for (i = 0; i < al_videos.size(); i++) {
+            for (int j = 0; j < ((Model_videos) al_videos.get(i)).getAl_videopath().size(); j++) {
+            }
+        }
+        return al_videos;
+    }
+

@@ -1,0 +1,179 @@
+
+=======Splash Handler
+
+final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent in = new Intent(SplashActivity.this , MainActivity.class);
+                startActivity(in);
+
+                finish();
+            }
+        }, 4000);
+
+---------Dependency
+
+    implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'com.loopj.android:android-async-http:1.4.9'
+
+
+---------
+
+    public static ArrayList<CategoryDetail> categoryDetails = new ArrayList<CategoryDetail>();
+    public CustomCategoryAdapter customCategoryAdapter;
+
+    GsonUtils gsonUtils;
+    ProgressDialog pDialog;
+
+--------
+
+        gsonUtils = GsonUtils.getInstance();
+
+    public void Webservice() {
+
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Loading Message... Please wait");
+        pDialog.setIndeterminate(false);
+        pDialog.setCancelable(false);
+        //pDialog.show();
+        AsyncHttpClient client = new AsyncHttpClient();
+
+
+        RequestParams params1 = new RequestParams();
+        params1.put("start",1);
+        params1.put("end",10);
+        try {
+            client.setConnectTimeout(50000);
+
+            client.post("http://www.psitsolution.in/API/get_mcategory.php", params1, new BaseJsonHttpResponseHandler<Category>() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, Category response) {
+
+                    categoryDetails.addAll(response.getCategoryDetail());
+                    //customCategoryAdapter.notifyDataSetChanged();
+
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, Category errorResponse) {
+
+                }
+
+                @Override
+                protected Category parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+                    //pDialog.dismiss();
+                    try {
+                        if (!isFailure && !rawJsonData.isEmpty()) {
+                            return gsonUtils.getGson().fromJson(rawJsonData, Category.class);
+                        }
+                    } catch (Exception e) {
+
+                    }
+                    return null;
+                }
+
+                @Override
+                public void onStart() {
+                    super.onStart();
+                }
+
+                @Override
+                public void onFinish() {
+                    super.onFinish();
+
+                }
+            });
+
+        } catch (Exception e) {
+
+        }
+    }
+
+--------In Adpater
+
+        vh.txtCategoryname.setText(categoryDetails.get(position).getCategoryName().toString());
+        String imgpath="http://www.psitsolution.in/"+categoryDetails.get(position).getCategoryImageurl();
+
+        Picasso.with(context)
+                .load(imgpath)
+                .placeholder(R.color.colorAccent)
+                .error(R.color.colorAccent)
+                .into(vh.imgCategory);
+
+==========WebSrvice For Messages
+
+    private ProgressDialog pDialog;
+    GsonUtils gsonUtils;
+    CustomMessageAdapter customMessageAdapter;
+    ArrayList<MessageDetail> messageDetails = new ArrayList<>();
+    ListView lstMessage;
+
+    gsonUtils = GsonUtils.getInstance();
+
+    String x;
+
+----------------
+
+    public void Webservice() {
+
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Loading Message ... Please wait");
+        pDialog.setIndeterminate(false);
+        pDialog.setCancelable(false);
+        pDialog.show();
+        AsyncHttpClient client = new AsyncHttpClient();
+
+        RequestParams params1 = new RequestParams();
+        params1.put("category_id",x);
+        try {
+            client.setConnectTimeout(50000);
+
+            client.post("http://www.psitsolution.in/API/get_message.php", params1, new BaseJsonHttpResponseHandler<Message>() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, String rawJsonResponse, Message response) {
+
+                    messageDetails.addAll(response.getMessageDetail());
+                    customMessageAdapter.notifyDataSetChanged();
+
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, Throwable throwable, String rawJsonData, Message errorResponse) {
+
+                }
+
+                @Override
+                protected Message parseResponse(String rawJsonData, boolean isFailure) throws Throwable {
+
+                    pDialog.dismiss();
+                    try {
+                        if (!isFailure && !rawJsonData.isEmpty()) {
+                            return gsonUtils.getGson().fromJson(rawJsonData, Message.class);
+                        }
+                    } catch (Exception e) {
+
+                    }
+
+                    return null;
+                }
+
+                @Override
+                public void onStart() {
+                    super.onStart();
+                }
+
+                @Override
+                public void onFinish() {
+                    super.onFinish();
+
+                }
+            });
+
+        } catch (Exception e) {
+
+        }
+    }
+
+
+

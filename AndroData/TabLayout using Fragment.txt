@@ -1,0 +1,90 @@
+
+-------XML
+
+ <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabs"
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabMode="fixed"
+            app:tabTextColor="@color/black"
+            app:tabGravity="fill" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+---------Activity
+
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+
+	viewPager = (ViewPager) findViewById(R.id.viewpager);
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+
+
+ private void setupViewPager(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        FPhotos fragHindi = new FPhotos();
+        FAlbum fragEnglish = new FAlbum();
+        FVideo fragGujarati = new FVideo();
+
+        Bundle bundle = new Bundle();
+
+        fragHindi.setArguments(bundle);
+        fragEnglish.setArguments(bundle);
+        fragGujarati.setArguments(bundle);
+
+        adapter.addFrag(fragHindi, "Photos");
+        adapter.addFrag(fragEnglish, "Albums");
+        adapter.addFrag(fragGujarati, "Video");
+
+        viewPager.setAdapter(adapter);
+
+
+    }
+
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
+
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public void addFrag(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
+    }
+
+///////Set View Pager
+
+ tabLayout.setupWithViewPager(viewPager);
+ setupViewPager(viewPager);

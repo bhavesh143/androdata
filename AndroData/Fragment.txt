@@ -1,0 +1,57 @@
+---------XML
+
+ <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+ </FrameLayout>
+
+----------Fragment TAG
+
+//in globle
+private static final String TAG = "Fragment1";
+
+----------Get Instance
+
+public static PhotoFragment getInstance() {
+        PhotoFragment fragment = new PhotoFragment();
+        fragment.setArguments(new Bundle());
+        return fragment;
+    }
+
+----------Set Fragment In Activity
+
+ if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction().add((int) R.id.container, PhotoFragment.getInstance()).commit();
+        }
+
+----------Replace Fragment
+
+ FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.container, new PhotoFragment());
+                fragmentTransaction.commit();            }
+        });
+
+
+----------Replace Fragment with Value
+
+PhotoViewFragment ldf = new PhotoViewFragment();
+Bundle args = new Bundle();
+args.putInt("value", i);
+ldf.setArguments(args);
+
+FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+fragmentTransaction.replace(R.id.container,ldf).addToBackStack( "Fragment1" );
+fragmentTransaction.commit();
+
+--------Receive Data from Fragment
+
+        int_position = getArguments().getInt("value");
+
+--------Initialze Activity In Fragment
+
+    ImageSelectionActivity imageSelectionActivity;
+
+    imageSelectionActivity = (ImageSelectionActivity) activity;

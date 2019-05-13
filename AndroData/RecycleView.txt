@@ -1,0 +1,93 @@
+--------XML
+
+ <android.support.v7.widget.RecyclerView
+        android:layout_centerVertical="true"
+        android:id="@+id/recycleview"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+    </android.support.v7.widget.RecyclerView>
+
+--------Initialize
+
+ RecycleAdapter recycleAdapter;
+
+ RecyclerView recyclerView;
+
+ recyclerView = (RecyclerView)findViewById(R.id.recycleview);
+
+--------Oncreate
+
+        recycleAdapter = new RecycleAdapter(this,paths);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setAdapter(recycleAdapter);
+
+--------Adapter
+
+public class RecycleAdapter extends RecyclerView.Adapter<RecycleAdapter.MyViewHolder> {
+
+    ArrayList<String> myimages = new ArrayList<>();
+    Context context;
+
+    public static class MyViewHolder extends RecyclerView.ViewHolder {
+
+        ImageView iv_selected;
+        ImageView iv_remove;
+
+        public MyViewHolder(View itemView) {
+            super(itemView);
+
+            this.iv_remove = (ImageView) itemView.findViewById(R.id.iv_remove);
+            this.iv_selected = (ImageView) itemView.findViewById(R.id.iv_selected);
+
+        }
+    }
+
+    public RecycleAdapter(Context context, ArrayList<String> myimages) {
+        this.myimages = myimages;
+        this.context = context;
+    }
+
+    @Override
+    public MyViewHolder onCreateViewHolder(ViewGroup parent,
+                                           int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_recycleview, parent, false);
+
+        return new MyViewHolder(view);
+
+    }
+
+    @Override
+    public void onBindViewHolder(final MyViewHolder holder, final int listPosition) {
+
+        final ImageView iv_selected = holder.iv_selected;
+        final ImageView iv_remove = holder.iv_remove;
+
+
+        Glide.with(context).load("file://" + myimages.get(listPosition)).into(iv_selected);
+
+        iv_remove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                myimages.remove(listPosition);
+                notifyDataSetChanged();
+            }
+        });
+
+    }
+
+
+    @Override
+    public int getItemCount() {
+
+        return myimages.size();
+    }
+
+
+}
+

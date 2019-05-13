@@ -1,0 +1,234 @@
+
+-------Intialize
+
+ static final int REQ_CODE_GALLERY_PICKER = 21;
+    static final int REQ_CODE_CSDK_IMAGE_EDITOR = 3001;
+    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 22;
+    private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_EDITOR = 3002;
+
+  private Uri mSelectedImageUri ;
+    String mCurrentPhotoPath;
+
+///////Create Folder
+
+  File f1 = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "Beard Photo Editor");
+        if (!f1.exists()) {
+            f1.mkdirs();
+        }
+
+        Button btnCamera = (Button) findViewById(R.id.btnCamera);
+        Button btnGallery = (Button) findViewById(R.id.btnGallery);
+        Button btnShare = (Button) findViewById(R.id.btnShare);
+        Button btnRate = (Button) findViewById(R.id.btnRate);
+        
+
+        btnCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startCameraIntent();
+            }
+        });
+
+
+        btnGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent galleryPickerIntent = new Intent();
+                galleryPickerIntent.setType("image/*");
+                galleryPickerIntent.setAction(Intent.ACTION_PICK);
+
+                startActivityForResult(Intent.createChooser(galleryPickerIntent, "Select an Image"), REQ_CODE_GALLERY_PICKER); // Can be any int
+            }
+        });
+
+---------------
+
+    private void startCameraIntent() {
+
+        Intent cameraInent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (cameraInent.resolveActivity(getApplicationContext().getPackageManager()) == null) {
+            Log.e("Error","This Application do not have Camera Application");
+            return;
+        }
+
+        File imageFile = null;
+        try {
+            imageFile = createImageFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Uri photoURI = FileProvider.getUriForFile(MainActivity.this, BuildConfig.APPLICATION_ID + ".provider", imageFile);
+
+        List<ResolveInfo> resolvedIntentActivities = getApplicationContext().getPackageManager().queryIntentActivities(cameraInent, PackageManager.MATCH_DEFAULT_ONLY);
+        for (ResolveInfo resolvedIntentInfo : resolvedIntentActivities) {
+            String packageName = resolvedIntentInfo.activityInfo.packageName;
+            getApplicationContext().grantUriPermission(packageName, photoURI, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        }
+        cameraInent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+        startActivityForResult(cameraInent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+
+    }
+
+------------------
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "Beard Photo Editor");
+
+        File image = File.createTempFile(
+                imageFileName,  // prefix
+                ".jpg",         // suffix
+                storageDir      // directory
+        );
+        mSelectedImageUri = Uri.fromFile(image);
+
+        mCurrentPhotoPath =image.getAbsolutePath();
+        return image;
+    }
+
+-------------------
+
+    public static Uri getImageContentUri(Context context, File imageFile) {
+        String filePath = imageFile.getAbsolutePath();
+        Cursor cursor = context.getContentResolver().query(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                new String[] { MediaStore.Images.Media._ID },
+                MediaStore.Images.Media.DATA + "=? ",
+                new String[] { filePath }, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID));
+            cursor.close();
+            return Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "" + id);
+        } else {
+            if (imageFile.exists()) {
+                ContentValues values = new ContentValues();
+                values.put(MediaStore.Images.Media.DATA, filePath);
+                return context.getContentResolver().insert(
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+            } else {
+                return null;
+            }
+        }
+    }
+
+
+--------------------
+
+    Uri CropUri;
+    String timeStamp;
+    String fname;
+    File file;
+    private void SaveImage(Bitmap finalBitmap) {
+
+        if (file.exists ()) file.delete ();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            finalBitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+            CropUri = getImageContentUri(this,file);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+----------------------
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case REQ_CODE_GALLERY_PICKER:
+                    mSelectedImageUri = data.getData();
+                    if (mSelectedImageUri != null) {
+
+                        try {
+                            img = MediaStore.Images.Media.getBitmap(this.getContentResolver(), mSelectedImageUri);
+                        //    Toast.makeText(getApplicationContext(),mSelectedImageUri.toString(),Toast.LENGTH_LONG).show();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                        fname = "JPEG_" + timeStamp + "_"+".png";
+
+
+                        file = new File(Environment.getExternalStoragePublicDirectory(
+                                Environment.DIRECTORY_PICTURES), "/Beard Photo Editor/"+fname);
+
+                        SaveImage(img);
+
+
+
+
+                        Intent intent = new Intent(MainActivity.this,CropActivity.class);
+                        intent.putExtra("imageuri",mSelectedImageUri.toString());
+                        intent.putExtra("filename",fname);
+                        startActivity(intent);
+
+
+                    } else {
+                        Toast.makeText(MainActivity.this, "Select an image from the Gallery", Toast.LENGTH_LONG).show();
+                    }
+                    break;
+
+                case CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE:
+
+
+                    if (mCurrentPhotoPath != null) {
+                        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(new File(mSelectedImageUri.toString()))));
+
+                        if (mSelectedImageUri != null) {
+
+
+
+                             mSelectedImageUri= getImageContentUri(this, new File(mCurrentPhotoPath));
+
+
+                          /*  Toast.makeText(getApplicationContext(),mSelectedImageUri.toString(),Toast.LENGTH_LONG).show();*/
+
+                            String fname=mCurrentPhotoPath.substring(mCurrentPhotoPath.lastIndexOf("/")+1);
+                            Intent intent = new Intent(MainActivity.this,CropActivity.class);
+                            intent.putExtra("imageuri",mSelectedImageUri.toString());
+                            intent.putExtra("filename",fname);
+                            startActivity(intent);
+
+
+
+
+                        } else {
+                            Toast.makeText(MainActivity.this, "Select an image from the Gallery", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                    break;
+
+                    default:
+                    break;
+
+            }
+        }
+    }
+
+----------Provider (In Menifest)
+
+ <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
+
+----------In res > xml > provider_paths
+
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <external-path name="external_files" path="Pictures/Beard Photo Editor"/>
+</paths>
+

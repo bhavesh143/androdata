@@ -1,0 +1,103 @@
+
+------XML
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:background="@color/colorPrimary"
+        android:layout_alignParentLeft="true" />
+
+
+------In res > menu > menu.xml
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:icon="@mipmap/ic_fav"
+        android:id="@+id/fav"
+        android:title="Favourite"
+        app:showAsAction="always"/>
+
+   <item
+       android:id="@+id/rate"
+       android:title="Rate" />
+
+    <item
+        android:id="@+id/share"
+        android:title="Share" />
+
+    <item
+        android:id="@+id/about"
+        android:title="About" />
+
+    <item
+        android:id="@+id/privacy"
+        android:title="Privacy Policy" />
+
+    <item
+        android:id="@+id/more"
+        android:title="More Apps" />
+
+</menu>
+
+
+----------In Activity
+
+    android.support.v7.widget.Toolbar toolbar;
+
+        toolbar = (android.support.v7.widget.Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Gallery");
+        setSupportActionBar(toolbar);
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch(item.getItemId()){
+
+            case R.id.fav:
+                Intent i = new Intent(MainActivity.this,FavActivity.class);
+                startActivity(i);
+                break;
+
+            case R.id.rate:
+                rateApp();
+                break;
+
+            case R.id.share:
+
+                shareapp();
+                break;
+
+            case R.id.about:
+                Intent inn =new Intent(MainActivity.this,AboutAppActivity.class);
+                startActivity(inn);
+
+                break;
+
+            case R.id.privacy:
+
+                Uri uri1 = Uri.parse("https://perfectautomation511190422.wordpress.com/2018/10/21/game2020/");
+                Intent intent2 = new Intent(Intent.ACTION_VIEW, uri1);
+                startActivity(intent2);
+
+                break;
+
+            case R.id.more:
+                Uri uri = Uri.parse("https://play.google.com/store/apps/developer?id=Game+2020");
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
+                break;
+
+        }
+        return true;
+    }

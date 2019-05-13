@@ -1,0 +1,308 @@
+
+///////////For String And Int
+
+public class Db_Helper extends SQLiteOpenHelper {
+
+    private static String CREATE_TABLE1;
+    private static String CREATE_TABLE2;
+
+
+    //    Database name
+    static String DATABASE_NAME = "gallery";
+
+    //    Table name
+    public static final String TABLE1_NAME = "imgFavourite";
+    public static final String TABLE2_NAME = "vidFavourite";
+
+
+    //      Fields for table 1
+    public static final String img_id = "img_id";
+    public static final String img_path = "img_path";
+
+    //      Fields for table 2
+    public static final String vid_id = "vid_id";
+    public static final String vid_path = "vid_path";
+
+    //      Required resorces to manage database
+    private ContentValues cValues;
+    private SQLiteDatabase dataBase = null;
+    private Cursor cursor;
+
+    public Db_Helper(Context context) {
+        super(context, context.getExternalFilesDir(null).getAbsolutePath()
+                + "/" + DATABASE_NAME, null, 1);
+    }
+
+    public Db_Helper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+        super(context, context.getExternalFilesDir(null).getAbsolutePath()
+                + "/" + DATABASE_NAME, null, 1);
+
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+
+
+        CREATE_TABLE1 = "CREATE TABLE " + TABLE1_NAME + "(" + img_id
+                + " INTEGER PRIMARY KEY autoincrement, " + img_path
+                + " TEXT) ";
+
+        db.execSQL(CREATE_TABLE1);
+        System.out.println("Table is created...........................!");
+
+        CREATE_TABLE2 = "CREATE TABLE " + TABLE2_NAME + "(" + vid_id
+                + " INTEGER PRIMARY KEY autoincrement, " + vid_path
+                + " TEXT) ";
+
+        db.execSQL(CREATE_TABLE2);
+        System.out.println("Table is created...........................!");
+
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int i, int i1) {
+
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE1_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE2_NAME);
+
+        onCreate(db);
+    }
+
+
+    public void insertRecord_image(String img_path) {
+        dataBase = getWritableDatabase();
+        cValues = new ContentValues();
+        cValues.put(this.img_path, img_path);
+        dataBase.insert(TABLE1_NAME, null, cValues);
+        dataBase.close();
+    }
+
+
+    public void insertRecord_video(String vid_path) {
+        dataBase = getWritableDatabase();
+        cValues = new ContentValues();
+        cValues.put(this.vid_path, vid_path);
+        dataBase.insert(TABLE2_NAME, null, cValues);
+        dataBase.close();
+    }
+
+
+    public void updateRecord_layout(String layout_name, int layout_id) {
+
+        dataBase = getWritableDatabase();
+
+        cValues = new ContentValues();
+
+        // cValues.put(this.layout_name, layout_name);
+        //  cValues.put(this.layout_id, layout_id);
+
+
+        dataBase.update(Db_Helper.TABLE1_NAME, cValues,
+                layout_id + "= ?", new String[]{String.valueOf(layout_id)});
+        dataBase.close();
+    }
+
+
+    public Cursor selectRecords_image() {
+
+        dataBase = getReadableDatabase();
+        cursor = dataBase.rawQuery("select * from " + TABLE1_NAME, null);
+        return cursor;
+    }
+
+    public Cursor checkRecords_image(String path) {
+
+        dataBase = getReadableDatabase();
+        cursor = dataBase.rawQuery("select * from " + TABLE1_NAME + " WHERE img_path='" + path + "'", null);
+        return cursor;
+    }
+
+
+    public Cursor selectRecords_path() {
+
+        dataBase = getReadableDatabase();
+        cursor = dataBase.rawQuery("select * from " + TABLE2_NAME, null);
+        return cursor;
+    }
+
+
+    public void deleteRecord_image(String imgpath) {
+
+        dataBase = getWritableDatabase();
+        dataBase.delete(TABLE1_NAME, img_path + "=?", new String[]{String.valueOf(imgpath)});
+        dataBase.close();
+    }
+
+
+    public void deleteRecord_video(int video_id) {
+
+        dataBase = getWritableDatabase();
+        dataBase.delete(TABLE2_NAME, vid_id + "=?", new String[]{String.valueOf(video_id)});
+        dataBase.close();
+    }
+
+
+}
+
+-------Insert Data to DataBase
+
+ 		int position = viewPager.getCurrentItem();
+
+                String s = g.get(position).toString();
+
+
+                Cursor check = db_helper.checkRecords_image(s);
+                if (check.getCount() > 0) {
+                    Toast.makeText(getApplicationContext(), "Already Added to Favourite", Toast.LENGTH_SHORT).show();
+                } else {
+                    db_helper.insertRecord_image(s);
+
+                    Toast.makeText(getApplicationContext(), "Added to Favourite", Toast.LENGTH_SHORT).show();
+                }
+
+                check.close();
+
+-------Get Data From DataBase
+
+ Db_Helper db_helper;
+
+
+ private void loadBoardData() {
+        // database handler
+        db_helper = new Db_Helper(this);
+        Cursor c = db_helper.selectRecords_image();
+
+        arrayListfav = new ArrayList<String>();
+        if (c != null) {
+            if (c.moveToFirst()) {
+                do {
+                    arrayListfav.add(String.valueOf(c.getString(1)));
+                }
+                while (c.moveToNext());
+            }
+        }
+    }
+
+
+----------DataBase With Photo Field
+
+public class DbHelper extends SQLiteOpenHelper {
+
+    private static String CREATE_TABLE1;
+    static String DATABASE_NAME = "MyContacts";
+    static String TABLE1_NAME = "MyConDatabase";
+
+    public static String ID = "id";
+    public static String ContactCategory = "ccategory";
+    public static String ContactName = "cname";
+    public static String ContactNumber = "cnumber";
+    public static String ContactPhoto = "cphoto";
+
+    ContentValues cValues;
+    SQLiteDatabase database = null;
+    Cursor cursor;
+
+    public DbHelper(Context context) {
+        super(context, context.getExternalFilesDir(null).getAbsolutePath() + "/" + DATABASE_NAME, null, 1);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        CREATE_TABLE1 = " CREATE TABLE " + TABLE1_NAME + "(" + ID + " INTEGER PRIMARY KEY autoincrement," + ContactCategory + " TEXT," + ContactName + " TEXT," + ContactNumber + " TEXT," + ContactPhoto + " BLOB)";
+        sqLiteDatabase.execSQL(CREATE_TABLE1);
+        System.out.println("Table is Created....................");
+
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+
+    }
+
+    public void insertRecord_textData(String ccategory, String cname, String cnumber, byte[] cphoto) {
+        database = getWritableDatabase();
+        cValues = new ContentValues();
+        cValues.put(ContactCategory, ccategory);
+        cValues.put(ContactName, cname);
+        cValues.put(ContactNumber, cnumber);
+        cValues.put(ContactPhoto, cphoto);
+        database.insert(TABLE1_NAME, null, cValues);
+        database.close();
+    }
+
+
+    public Cursor selectRecord_textData() {
+        database = getReadableDatabase();
+        cursor = database.rawQuery("select * from " + TABLE1_NAME, null);
+        return cursor;
+    }
+
+//    public void updateRecord(String id,String textData) {
+//
+//        database = getWritableDatabase();
+//
+//        cValues = new ContentValues();
+//
+//        cValues.put(TextData, textData);
+//        
+//        //    Update data from database table
+//        database.update(DbHelper.TABLE1_NAME, cValues,
+//                ID + "= ?", new String[]{String.valueOf(id)});
+//                database.close();
+//    }
+
+    public void deleteRecord(String id) {
+
+        database = getWritableDatabase();
+        database.delete(TABLE1_NAME, ID + "=?", new String[]{String.valueOf(id)});
+        database.close();
+    }
+
+
+}
+
+--------Get Data From DataBase
+
+    private void getData() {
+
+        dbHelper = new DbHelper(getContext());
+
+        Cursor cursor = dbHelper.selectRecord_textData();
+        contactdetail = new ArrayList<CModel>();
+
+        if (cursor.moveToFirst()) {
+            do {
+                String Id = cursor.getString(cursor.getColumnIndex(DbHelper.ID));
+                int contactCategory = Integer.parseInt(cursor.getString(cursor.getColumnIndex(DbHelper.ContactCategory)));
+                String contactName = cursor.getString(cursor.getColumnIndex(DbHelper.ContactName));
+                String contactNumber = cursor.getString(cursor.getColumnIndex(DbHelper.ContactNumber));
+                byte[] contactPhoto = cursor.getBlob(cursor.getColumnIndex(DbHelper.ContactPhoto));
+
+                if (contactPhoto != null){
+                    Bitmap ccphoto = getImage(contactPhoto);
+
+                    if (contactCategory == 1) {
+                        contactdetail.add(new CModel(Id, contactCategory, contactName, contactNumber, ccphoto));
+                    }
+
+                }
+                else{
+                    if (contactCategory == 1) {
+                        contactdetail.add(new CModel(Id, contactCategory, contactName, contactNumber, null));
+                    }
+                }
+
+            } while (cursor.moveToNext());
+
+
+        }
+
+        cursor.close();
+
+    }
+
+--------Delete Data From DataBase
+
+			    dbHelper = new DbHelper(context);
+                            String id  = contents.get(position).getID();
+                            dbHelper.deleteRecord(id);

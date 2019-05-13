@@ -1,0 +1,43 @@
+
+--------In Gradle
+
+defaultConfig{
+
+	//....
+        manifestPlaceholders = [onesignal_app_id: "bfe2444d-907b-473e-9286-21fe78939a1a",
+                                // Project number pulled from dashboard, local value is ignored.
+                                onesignal_google_project_number: "109004357124"]
+}
+
+    implementation 'com.google.firebase:firebase-core:10.0.1'
+    implementation 'com.onesignal:OneSignal:3.5.8'
+
+//below Dependency
+
+apply plugin: 'com.google.gms.google-services'
+
+--------In Project Gradle
+
+ dependencies {
+        
+	//..
+        classpath 'com.google.gms:google-services:3.0.0'
+        
+    }
+
+---------In Menifest
+
+ 	<service
+            android:name="onesignal.MyNotificationExtenderService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.onesignal.NotificationExtender" />
+            </intent-filter>
+        </service>
+
+-----------In Main Activity
+
+        OneSignal.startInit(this)
+                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+                .unsubscribeWhenNotificationsAreDisabled(true)
+                .init();
